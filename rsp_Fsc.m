@@ -94,11 +94,15 @@ for i = 1:n
 for j = 1:n
 for k = 1:n
         
-  F = [F, rho_lambda{i,j,k}>=0,trace(rho_lambda{i,j,k})==trace(rho_lambda{1,1,1})];
+  F = [F, rho_lambda{i,j,k}>=0];
 
 end
 end
 end
+F = [F,trace(rho_lambda{1,1,1}+rho_lambda{1,1,2}+rho_lambda{1,2,1}+rho_lambda{1,2,2})==trace(rho_lambda{2,1,1}+rho_lambda{2,1,2}+rho_lambda{2,2,1}+rho_lambda{2,2,2})];
+ F = [F,trace(rho_lambda{1,1,1}+rho_lambda{1,1,2}+rho_lambda{2,1,1}+rho_lambda{2,1,2})==trace(rho_lambda{1,2,1}+rho_lambda{1,2,2}+rho_lambda{2,2,1}+rho_lambda{2,2,2})];
+ F = [F,trace(rho_lambda{1,1,1}+rho_lambda{1,2,1}+rho_lambda{2,1,1}+rho_lambda{2,2,1})==trace(rho_lambda{1,1,2}+rho_lambda{1,2,2}+rho_lambda{2,1,2}+rho_lambda{2,2,2})];
+
 
 %% constraits
 Fc_expt=[F ,  chi_Ec >= 0, trace(chi_Ec) <= 1];
