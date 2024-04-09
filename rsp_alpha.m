@@ -5,7 +5,7 @@ end
 
 n=2; %dimension of qubit
 nx=3; %number of measurements
-%% define lambda and sigma_[lambda]
+%% define SDP parameters
 for i = 1:n
 for j = 1:n
 for k = 1:n
@@ -17,7 +17,7 @@ end
 end
 end
 
-%% define deterministic probability
+
 for a=1:n
 for x=1:nx
 for i=1:n
@@ -31,7 +31,7 @@ end
 end
 end
 end
-%% define classical equations
+
 for a=1:n
 for x=1:nx
   rho_rcs{a,x} = 0*sdpvar(n,n);
@@ -49,7 +49,7 @@ end
 
 
 
-%% rhoc belongs sdpvar
+%% classical chi matrix
 for i=1:n
 for j=1:n
   
@@ -58,13 +58,13 @@ for j=1:n
 end
 end 
 
-%% classical_input
+
 rhoc{1,1}=rho_rcs{1,3};
 rhoc{1,2}=rho_rcs{1,1}+sqrt(-1)*rho_rcs{1,2}-(1+sqrt(-1))*(rho_rcs{1,3}+rho_rcs{2,3})/2;
 rhoc{2,1}=rho_rcs{1,1}-sqrt(-1)*rho_rcs{1,2}-(1-sqrt(-1))*(rho_rcs{1,3}+rho_rcs{2,3})/2;
 rhoc{2,2}=rho_rcs{2,3};
 
-%% classical X matrix
+
 for i=1:2
     for j=1:2
         for k=1:2
@@ -78,14 +78,10 @@ end
 
 
 
+chi_expt=chi_expt/trace(chi_expt);
 
-
-
-chi_expt=chi_expt/trace(chi_expt)
-
-
-sums=0*sdpvar(1,1);
 %% constraits
+
 F = []; 
 
 
@@ -98,11 +94,13 @@ for k = 1:n
 end
 end
 end
+F = [F, chi_Ec >= 0];
 F = [F,trace(rho_lambda{1,1,1}+rho_lambda{1,1,2}+rho_lambda{1,2,1}+rho_lambda{1,2,2})==trace(rho_lambda{2,1,1}+rho_lambda{2,1,2}+rho_lambda{2,2,1}+rho_lambda{2,2,2})];
- F = [F,trace(rho_lambda{1,1,1}+rho_lambda{1,1,2}+rho_lambda{2,1,1}+rho_lambda{2,1,2})==trace(rho_lambda{1,2,1}+rho_lambda{1,2,2}+rho_lambda{2,2,1}+rho_lambda{2,2,2})];
- F = [F,trace(rho_lambda{1,1,1}+rho_lambda{1,2,1}+rho_lambda{2,1,1}+rho_lambda{2,2,1})==trace(rho_lambda{1,1,2}+rho_lambda{1,2,2}+rho_lambda{2,1,2}+rho_lambda{2,2,2})];
+F = [F,trace(rho_lambda{1,1,1}+rho_lambda{1,1,2}+rho_lambda{2,1,1}+rho_lambda{2,1,2})==trace(rho_lambda{1,2,1}+rho_lambda{1,2,2}+rho_lambda{2,2,1}+rho_lambda{2,2,2})];
+F = [F,trace(rho_lambda{1,1,1}+rho_lambda{1,2,1}+rho_lambda{2,1,1}+rho_lambda{2,2,1})==trace(rho_lambda{1,1,2}+rho_lambda{1,2,2}+rho_lambda{2,1,2}+rho_lambda{2,2,2})];
 
-Fa_expt=[F , chi_expt-chi_Ec >= 0, chi_Ec >= 0];
+
+Fa_expt=[F , chi_expt-chi_Ec >= 0];
 
 
 
